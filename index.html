@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chrissi's image tool</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fff6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171009" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
+<style>
+@font-face {
+    font-family: Lora;
+    font-weight: 500;
+    font-display: block;
+    src: url(assets/lora.woff) format("woff");
+}
+
+:root {
+    --background: #fff6f0;
+    --accent: #2b170d;
+    --body: #5c3f2e;
+    --sub: #785a48;
+    --highlight: #fde5d5;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #171009;
+        --accent: #fdebdd;
+        --body: #cdb3a2;
+        --sub: #ab9282;
+        --highlight: #35231a;
+    }
+}
+
+* {
+    margin: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    font-family: Lora;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.35;
+    background: var(--background);
+    color: var(--body);
+    cursor: default;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+}
+
+::selection {
+    background: var(--highlight);
+}
+
+main {
+    flex: 1;
+    max-width: 500px;
+    margin: max(16px, 8vh) 16px 16px;
+}
+
+h1 {
+    font-size: 1.25em;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+a {
+    color: inherit;
+    text-underline-offset: 3px;
+}
+
+button {
+    all: unset;
+    cursor: pointer;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.i {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sub {
+    font-size: 0.9em;
+    color: var(--sub);
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+}
+
+@keyframes grow {
+    from { transform: scale(0.5); }
+}
+
+main > * {
+    animation: rise 0.6s var(--ease) backwards;
+    animation-delay: calc(var(--n, 0) * 70ms);
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+input {
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.dropzone {
+    margin-top: 24px;
+    padding: 32px 16px;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: 16px;
+    background: var(--highlight);
+    text-align: center;
+    box-shadow: inset 0 0 0 1px transparent;
+    transition: transform 0.25s var(--ease), box-shadow 0.2s;
+}
+
+.dropzone .i {
+    width: 32px;
+    height: 32px;
+    color: var(--accent);
+    transition: transform 0.3s var(--spring);
+}
+
+.dropzone:hover .i,
+.dropzone.drag-over .i {
+    transform: translateY(-4px);
+}
+
+.dropzone.drag-over {
+    transform: scale(1.02);
+    box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.dropzone input {
+    display: none;
+}
+
+#notice {
+    margin-top: 12px;
+    text-align: center;
+}
+
+#editor {
+    margin-top: 24px;
+}
+
+#stage {
+    display: block;
+    margin: 0 auto;
+    border-radius: 16px;
+    background: var(--highlight);
+    cursor: grab;
+    touch-action: none;
+}
+
+#stage.dragging {
+    cursor: grabbing;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.zoom {
+    justify-content: flex-start;
+    color: var(--sub);
+}
+
+.select {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select .i {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    color: var(--sub);
+}
+
+select {
+    appearance: none;
+    padding: 8px 40px 8px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--highlight);
+    color: var(--accent);
+    font: inherit;
+    cursor: pointer;
+}
+
+.size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.size input {
+    width: 4.5em;
+    box-sizing: border-box;
+    padding: 8px 4px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--highlight);
+    color: var(--accent);
+    font: inherit;
+    text-align: center;
+    appearance: textfield;
+    cursor: text;
+}
+
+.size input::-webkit-inner-spin-button {
+    display: none;
+}
+
+.size input:disabled,
+input[type="range"]:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.chips {
+    display: flex;
+    gap: 8px;
+}
+
+.chip {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--highlight);
+    color: var(--accent);
+    transition: transform 0.2s var(--ease), background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.chip[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--background);
+}
+
+.chip:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.chip:enabled:active {
+    transform: scale(0.94);
+}
+
+.meter {
+    justify-content: flex-start;
+}
+
+.meter .i {
+    animation: grow 0.35s var(--spring);
+}
+
+.meter .alert,
+[data-ok="false"] .check {
+    display: none;
+}
+
+[data-ok="false"] .alert {
+    display: block;
+}
+
+#sizeText {
+    min-width: 10.5em;
+}
+
+.bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--highlight);
+}
+
+.bar::after {
+    content: "";
+    display: block;
+    height: 100%;
+    width: var(--fill, 0%);
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 0.6s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+#hint {
+    min-height: 1.35em;
+    margin-top: 8px;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.pill {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    transition: transform 0.2s var(--ease), opacity 0.2s;
+}
+
+.pill:active {
+    transform: scale(0.94);
+}
+
+@media (hover: hover) {
+    .pill:hover {
+        transform: translateY(-2px);
+        opacity: 0.88;
+    }
+}
+
+.pill.main {
+    flex: 1;
+    background: var(--accent);
+    color: var(--background);
+}
+
+.pill.ghost {
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--sub);
+}
+
+.faq {
+    margin-top: 32px;
+}
+
+.faq-item {
+    margin-top: 8px;
+    border-radius: 16px;
+    background: var(--highlight);
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 14px 16px;
+    color: var(--accent);
+}
+
+.faq-question:focus-visible {
+    outline-offset: -2px;
+}
+
+.faq-question .i {
+    color: var(--sub);
+    transition: transform 0.3s var(--spring);
+}
+
+.open .faq-question .i {
+    transform: rotate(180deg);
+}
+
+.faq-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s var(--ease);
+}
+
+.open .faq-wrap {
+    grid-template-rows: 1fr;
+}
+
+.faq-inner {
+    overflow: hidden;
+}
+
+.faq-answer {
+    padding: 0 16px 16px;
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+.faq-answer p + p {
+    margin-top: 12px;
+}
+
+.credit {
+    margin-top: 32px;
+}
+</style>
+</head>
+<body>
+<main>
+    <h1>chrissi's image tool</h1>
+
+    <label class="dropzone" id="dropzone" style="--n:1">
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 8h.01" /><path d="M12.5 21h-6.5a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v6.5" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l3.5 3.5" /><path d="M14 14l1 -1c.679 -.653 1.473 -.829 2.214 -.526" /><path d="M19 22v-6" /><path d="M22 19l-3 -3l-3 3" /></svg>
+        <span>Drop an image here, or click to browse</span>
+        <span class="sub">JPEG, PNG, WebP · resize, crop, convert and compress</span>
+    </label>
+
+    <p class="sub" id="notice" role="status" hidden></p>
+
+    <div id="editor" hidden>
+        <canvas id="stage" aria-label="Crop area, drag to move the image"></canvas>
+
+        <div class="row zoom">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M7 10l6 0" /><path d="M10 7l0 6" /><path d="M21 21l-6 -6" /></svg>
+            <input type="range" id="zoom" min="100" max="800" value="100" aria-label="Zoom">
+        </div>
+
+        <div class="row">
+            <label for="preset">Preset</label>
+            <span class="select">
+                <select id="preset"></select>
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6l6 -6" /></svg>
+            </span>
+        </div>
+
+        <div class="row">
+            <label for="width">Size</label>
+            <span class="size">
+                <input type="number" id="width" min="1" max="4096" aria-label="Width in pixels">
+                ×
+                <input type="number" id="height" min="1" max="4096" aria-label="Height in pixels">
+            </span>
+        </div>
+
+        <div class="row">
+            <span>Format</span>
+            <span class="chips" id="formats">
+                <button class="chip" type="button" data-format="png" aria-pressed="false">PNG</button>
+                <button class="chip" type="button" data-format="jpg" aria-pressed="false">JPG</button>
+                <button class="chip" type="button" data-format="webp" aria-pressed="false">WebP</button>
+            </span>
+        </div>
+
+        <div class="row">
+            <label for="quality">Quality</label>
+            <input type="range" id="quality" min="10" max="100" value="90">
+            <output id="qualityValue" for="quality">90</output>
+        </div>
+
+        <p class="row meter sub" id="meter" data-ok="true">
+            <svg class="i check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg>
+            <svg class="i alert" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 8v4" /><path d="M12 16h.01" /></svg>
+            <span id="sizeText" aria-live="polite"></span>
+            <span class="bar" id="bar"></span>
+        </p>
+        <p class="sub" id="hint"></p>
+
+        <div class="actions">
+            <button class="pill ghost" id="reset" type="button">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                Start over
+            </button>
+            <button class="pill main" id="download" type="button">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                Download
+            </button>
+        </div>
+    </div>
+
+    <div class="faq" style="--n:2">
+        <div class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">
+                How does it work?
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6l6 -6" /></svg>
+            </button>
+            <div class="faq-wrap"><div class="faq-inner"><div class="faq-answer">
+                <p>Pick an image, drag it to move it and use the slider or the mouse wheel to zoom. The bright frame is what gets exported. Everything runs in your browser on a canvas, nothing gets uploaded.</p>
+                <p>Because the image is redrawn, all metadata like camera info and GPS is dropped automatically. The size shown updates live while you change the format or quality, so you can stay under a platform's limit.</p>
+            </div></div></div>
+        </div>
+    </div>
+
+    <p class="sub credit" style="--n:3"><a href="https://chrissitxt.me">made by chrissi</a></p>
+</main>
+
+<script>
+// "No preset" is default
+const PRESETS = {
+    none: { label: "No preset", formats: ["png", "jpg", "webp"], free: true },
+    sticker: { label: "Discord sticker", width: 320, height: 320, formats: ["png"], maxKB: 512 },
+    emoji: { label: "Discord emoji", width: 128, height: 128, formats: ["png", "jpg", "webp"], maxKB: 256 },
+    profileBanner: { label: "Discord profile banner", width: 680, height: 240, formats: ["jpg", "png"], maxKB: 10000 },
+    banner: { label: "Discord server banner", width: 960, height: 540, formats: ["jpg", "png", "webp"] },
+    youtube: { label: "YouTube thumbnail", width: 1920, height: 1080, formats: ["jpg", "png"], maxKB: 2000 },
+    avatar: { label: "Profile picture", width: 512, height: 512, formats: ["jpg", "png", "webp"] }
+};
+
+const MIME = { png: "image/png", jpg: "image/jpeg", webp: "image/webp" };
+const EXTENSION = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
+const EXTENSION_TYPES = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
+const MAX_SIDE = 4096;
+const MAX_ZOOM = 8;
+const MARGIN = 24;
+const MAX_FRAME_HEIGHT = 340;
+const UPDATE_DELAY = 150;
+const NOTICE_DELAY = 5000;
+
+const $ = id => document.getElementById(id);
+const stage = $("stage");
+const ctx = stage.getContext("2d");
+
+let image = null;
+let baseName = "";
+let preset = PRESETS.none;
+let format = "png";
+let sourceFormat = "png";
+let zoom = 1;
+let drag = null;
+let noticeTimeout = null;
+let updateTimeout = null;
+let job = 0;
+
+// the frame is the part that gets exported
+const view = { width: 0, height: 0, fx: 0, fy: 0, fw: 0, fh: 0, scale: 1, tx: 0, ty: 0 };
+
+function outputSize() {
+    return { width: Number($("width").value), height: Number($("height").value) };
+}
+
+function formatSize(bytes) {
+    if (bytes < 1000) return bytes + " B";
+    if (bytes < 1000 * 1000) return (bytes / 1000).toFixed(1) + " KB";
+    return (bytes / (1000 * 1000)).toFixed(1) + " MB";
+}
+
+function fileKind(file) {
+    if (Object.values(MIME).includes(file.type)) return file.type;
+    return EXTENSION_TYPES[file.name.split(".").pop().toLowerCase()] || null;
+}
+
+function showNotice(text) {
+    $("notice").textContent = text;
+    $("notice").hidden = false;
+    clearTimeout(noticeTimeout);
+    noticeTimeout = setTimeout(() => { $("notice").hidden = true; }, NOTICE_DELAY);
+}
+
+function coverScale() {
+    return Math.max(view.fw / image.width, view.fh / image.height);
+}
+
+function clampView() {
+    view.tx = Math.min(view.fx, Math.max(view.fx + view.fw - image.width * view.scale, view.tx));
+    view.ty = Math.min(view.fy, Math.max(view.fy + view.fh - image.height * view.scale, view.ty));
+}
+
+function centerView() {
+    view.tx = view.fx + (view.fw - image.width * view.scale) / 2;
+    view.ty = view.fy + (view.fh - image.height * view.scale) / 2;
+}
+
+function layout() {
+    const { width, height } = outputSize();
+    const available = $("editor").clientWidth;
+    view.fw = Math.min(available - MARGIN * 2, MAX_FRAME_HEIGHT * width / height);
+    view.fh = view.fw * height / width;
+    view.width = available;
+    view.height = view.fh + MARGIN * 2;
+    view.fx = (available - view.fw) / 2;
+    view.fy = MARGIN;
+    view.scale = coverScale() * zoom;
+
+    const dpr = window.devicePixelRatio || 1;
+    stage.width = Math.round(view.width * dpr);
+    stage.height = Math.round(view.height * dpr);
+    stage.style.width = view.width + "px";
+    stage.style.height = view.height + "px";
+    centerView();
+    draw();
+}
+
+function draw() {
+    const dpr = window.devicePixelRatio || 1;
+    const css = getComputedStyle(document.documentElement);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, view.width, view.height);
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(image, view.tx, view.ty, image.width * view.scale, image.height * view.scale);
+
+    ctx.globalAlpha = 0.65;
+    ctx.fillStyle = css.getPropertyValue("--background");
+    ctx.beginPath();
+    ctx.rect(0, 0, view.width, view.height);
+    ctx.rect(view.fx, view.fy, view.fw, view.fh);
+    ctx.fill("evenodd");
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = css.getPropertyValue("--accent");
+    ctx.lineWidth = 2;
+    ctx.strokeRect(view.fx, view.fy, view.fw, view.fh);
+}
+
+function setZoom(next, px = view.fx + view.fw / 2, py = view.fy + view.fh / 2) {
+    zoom = Math.min(MAX_ZOOM, Math.max(1, next));
+    const scale = coverScale() * zoom;
+    const ratio = scale / view.scale;
+    view.tx = px - (px - view.tx) * ratio;
+    view.ty = py - (py - view.ty) * ratio;
+    view.scale = scale;
+    clampView();
+    $("zoom").value = Math.round(zoom * 100);
+    draw();
+    schedule();
+}
+
+async function encode() {
+    const { width, height } = outputSize();
+    const out = document.createElement("canvas");
+    out.width = width;
+    out.height = height;
+    const outCtx = out.getContext("2d");
+    if (format === "jpg") {
+        outCtx.fillStyle = "#fff";
+        outCtx.fillRect(0, 0, width, height);
+    }
+    outCtx.imageSmoothingQuality = "high";
+    outCtx.drawImage(
+        image,
+        (view.fx - view.tx) / view.scale, (view.fy - view.ty) / view.scale,
+        view.fw / view.scale, view.fh / view.scale,
+        0, 0, width, height
+    );
+    return new Promise(resolve => out.toBlob(resolve, MIME[format], Number($("quality").value) / 100));
+}
+
+function schedule() {
+    clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(update, UPDATE_DELAY);
+}
+
+async function update() {
+    const id = ++job;
+    const blob = await encode();
+    if (id !== job || !blob) return;
+
+    const limit = preset.maxKB ? preset.maxKB * 1000 : 0;
+    const ok = !limit || blob.size <= limit;
+    $("sizeText").textContent = limit ? `${formatSize(blob.size)} / ${preset.maxKB} KB` : formatSize(blob.size);
+    $("bar").hidden = !limit;
+    $("bar").style.setProperty("--fill", limit ? Math.min(100, blob.size / limit * 100) + "%" : "0%");
+    $("meter").dataset.ok = ok;
+    $("hint").textContent = ok ? "" : format === "png"
+        ? "Over the limit, PNG can't be compressed further, try a smaller size"
+        : "Over the limit, lower the quality or pick a smaller size";
+}
+
+function applyFormat(next) {
+    format = next;
+    document.querySelectorAll(".chip").forEach(chip => {
+        chip.setAttribute("aria-pressed", chip.dataset.format === format);
+        chip.disabled = !preset.formats.includes(chip.dataset.format);
+    });
+    $("quality").disabled = format === "png";
+}
+
+function applyPreset() {
+    preset = PRESETS[$("preset").value];
+    const fit = Math.min(1, MAX_SIDE / Math.max(image.width, image.height));
+    $("width").value = preset.free ? Math.round(image.width * fit) : preset.width;
+    $("height").value = preset.free ? Math.round(image.height * fit) : preset.height;
+    $("width").disabled = $("height").disabled = !preset.free;
+    applyFormat(preset.free ? sourceFormat : preset.formats[0]);
+    layout();
+    schedule();
+}
+
+async function loadFile(file) {
+    if (!fileKind(file)) return showNotice("Only JPEG, PNG and WebP images work");
+    let bitmap;
+    try {
+        bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    } catch {
+        return showNotice("Couldn't open that image");
+    }
+
+    if (image) image.close();
+    image = bitmap;
+    baseName = file.name.replace(/\.[^.]+$/, "");
+    sourceFormat = EXTENSION[fileKind(file)];
+    zoom = 1;
+    $("zoom").value = 100;
+    $("dropzone").hidden = true;
+    $("editor").hidden = false;
+    applyPreset();
+}
+
+function reset() {
+    image.close();
+    image = null;
+    $("editor").hidden = true;
+    $("dropzone").hidden = false;
+}
+
+// no preset stays first, the rest is sorted by name
+$("preset").replaceChildren(...Object.entries(PRESETS)
+    .sort((a, b) => Boolean(b[1].free) - Boolean(a[1].free) || a[1].label.localeCompare(b[1].label))
+    .map(([key, { label }]) => new Option(label, key)));
+$("preset").addEventListener("change", applyPreset);
+
+["width", "height"].forEach(id => $(id).addEventListener("input", () => {
+    const value = Number($(id).value);
+    if (!Number.isInteger(value) || value < 1 || value > MAX_SIDE) return;
+    layout();
+    schedule();
+}));
+
+document.querySelectorAll(".chip").forEach(chip => chip.addEventListener("click", () => {
+    applyFormat(chip.dataset.format);
+    schedule();
+}));
+
+$("quality").addEventListener("input", () => {
+    $("qualityValue").textContent = $("quality").value;
+    schedule();
+});
+
+$("zoom").addEventListener("input", () => setZoom($("zoom").value / 100));
+
+stage.addEventListener("pointerdown", e => {
+    drag = { x: e.clientX, y: e.clientY };
+    stage.setPointerCapture(e.pointerId);
+    stage.classList.add("dragging");
+});
+
+stage.addEventListener("pointermove", e => {
+    if (!drag) return;
+    view.tx += e.clientX - drag.x;
+    view.ty += e.clientY - drag.y;
+    drag = { x: e.clientX, y: e.clientY };
+    clampView();
+    draw();
+    schedule();
+});
+
+["pointerup", "pointercancel"].forEach(evt => stage.addEventListener(evt, () => {
+    drag = null;
+    stage.classList.remove("dragging");
+}));
+
+stage.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = stage.getBoundingClientRect();
+    setZoom(zoom * Math.exp(-e.deltaY * 0.0015), e.clientX - rect.left, e.clientY - rect.top);
+}, { passive: false });
+
+$("download").addEventListener("click", async () => {
+    const blob = await encode();
+    if (!blob) return;
+    const { width, height } = outputSize();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    // the browser can fall back to png if it can't make the format, so the extension comes from the file
+    a.download = `${baseName}-${width}x${height}.${EXTENSION[blob.type]}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+$("reset").addEventListener("click", reset);
+
+document.querySelectorAll(".faq-question").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const isOpen = btn.closest(".faq-item").classList.toggle("open");
+        btn.setAttribute("aria-expanded", isOpen);
+    });
+});
+
+["dragover", "drop"].forEach(evt => window.addEventListener(evt, e => e.preventDefault()));
+
+$("dropzone").addEventListener("dragover", () => $("dropzone").classList.add("drag-over"));
+$("dropzone").addEventListener("dragleave", e => {
+    if (!$("dropzone").contains(e.relatedTarget)) $("dropzone").classList.remove("drag-over");
+});
+$("dropzone").addEventListener("drop", e => {
+    $("dropzone").classList.remove("drag-over");
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+$("editor").addEventListener("drop", e => {
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+
+$("fileInput").addEventListener("change", () => {
+    if ($("fileInput").files[0]) loadFile($("fileInput").files[0]);
+    $("fileInput").value = "";
+});
+
+window.addEventListener("resize", () => {
+    if (image) layout();
+});
+</script>
+</body>
+</html>
