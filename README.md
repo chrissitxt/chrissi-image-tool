@@ -9,7 +9,7 @@ Redraws your image on a canvas at the size and format you choose and exports it 
 ## Features
 
 - Drag to move and zoom to crop, the frame shows exactly what gets exported
-- Presets for Discord stickers, emoji, profile banners and server banners, YouTube thumbnails, and profile pictures, all editable in one config object at the top of the script
+- Presets for Discord stickers, emojis, profile banners and server banners, YouTube thumbnails, and profile pictures, all editable in one config object at the top of the script
 - Or no preset: any size up to 4096 px, starting from the image's own size
 - Output as PNG, JPG, or WebP, with a quality slider for JPG and WebP
 - Live file size next to the preset's limit, so you know before you download
