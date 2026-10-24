@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>chrissi's image tool</title>
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#fff6f0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171009" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chrissi's image tool</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#fff6f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#171009" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
+    <style>
 @font-face {
-    font-family: Lora;
+    font-family: "Lora";
     font-weight: 500;
     font-display: block;
-    src: url(assets/lora.woff) format("woff");
+    src: url("assets/Lora-Medium.woff2") format("woff2");
 }
 
 :root {
@@ -44,28 +44,28 @@
     display: none !important;
 }
 
+main {
+    flex: 1;
+    max-width: 500px;
+    margin: max(16px, 8vh) 16px 16px;
+}
+
 body {
-    font-family: Lora;
+    font-family: "Lora";
     font-size: 16px;
     font-weight: 500;
     line-height: 1.35;
     background: var(--background);
     color: var(--body);
     cursor: default;
-    min-height: 100dvh;
     display: flex;
     justify-content: center;
+    min-height: 100dvh;
     -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
     background: var(--highlight);
-}
-
-main {
-    flex: 1;
-    max-width: 500px;
-    margin: max(16px, 8vh) 16px 16px;
 }
 
 h1 {
@@ -149,9 +149,14 @@ input {
     transition: transform 0.3s var(--spring);
 }
 
-.dropzone:hover .i,
 .dropzone.drag-over .i {
     transform: translateY(-4px);
+}
+
+@media (hover: hover) {
+    .dropzone:hover .i {
+        transform: translateY(-4px);
+    }
 }
 
 .dropzone.drag-over {
@@ -429,7 +434,7 @@ input[type="range"]:disabled {
 .credit {
     margin-top: 32px;
 }
-</style>
+    </style>
 </head>
 <body>
 <main>

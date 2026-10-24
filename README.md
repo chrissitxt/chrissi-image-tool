@@ -26,3 +26,17 @@ Everything runs in the browser. Images are never uploaded to a server or process
 - [Discord server banner](https://support.discord.com/hc/en-us/articles/360028716472-Server-Banners): 16:9, at least 960 x 540
 - [YouTube thumbnail](https://support.google.com/youtube/answer/72431): 16:9, at least 640 px wide, JPG or PNG, max 2 MB on mobile
 - Profile picture: not an official limit, just a sensible default
+
+## Design
+
+Font: Lora (SIL Open Font License), weight 500, 16px text and 20px heading.
+
+Design tokens, peach theme. Light and dark follow the system.
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| background | `#fff6f0` | `#171009` |
+| accent | `#2b170d` | `#fdebdd` |
+| body | `#5c3f2e` | `#cdb3a2` |
+| sub | `#785a48` | `#ab9282` |
+| highlight | `#fde5d5` | `#35231a` |
