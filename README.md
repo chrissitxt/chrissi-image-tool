@@ -29,7 +29,7 @@ Everything runs in the browser. Images are never uploaded to a server or process
 
 ## Design
 
-Font: Lora (SIL Open Font License), weight 500, 16px text and 20px heading.
+Font: Crimson Pro (SIL Open Font License), weight 500, 18px text and 1.25em heading.
 
 Design tokens, peach theme. Light and dark follow the system.
 
